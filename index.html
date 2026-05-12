@@ -419,6 +419,12 @@
   .btn.loading .spinner { display: inline-block; }
   .btn.loading .btn-text { opacity: 0.7; }
 
+  .tab.active-purple {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    box-shadow: 0 4px 16px rgba(108,92,231,0.35);
+  }
+
   /* Required star */
   .req { color: var(--accent); margin-right: 2px; }
 </style>
@@ -445,7 +451,7 @@
   </div>
 
   <!-- Tabs -->
-  <div class="tabs">
+  <div class="tabs" style="grid-template-columns: repeat(4, 1fr);">
     <button class="tab active" onclick="switchTab('checkin', this, 'active')" id="tab-checkin">
       <span class="tab-icon">✅</span>
       <span>حضور</span>
@@ -457,6 +463,10 @@
     <button class="tab" onclick="switchTab('incident', this, 'active-gold')" id="tab-incident">
       <span class="tab-icon">⚠️</span>
       <span>حادثة</span>
+    </button>
+    <button class="tab" onclick="switchTab('notes', this, 'active-purple')" id="tab-notes">
+      <span class="tab-icon">📝</span>
+      <span>ملاحظات</span>
     </button>
   </div>
 
@@ -568,9 +578,80 @@
     </button>
   </div>
 
-</div>
+  <!-- Notes Card -->
+  <div class="card" id="card-notes">
+    <div class="card-title">
+      <div class="dot" style="background:#6c5ce7; box-shadow: 0 0 8px #6c5ce7;"></div>
+      ملاحظات الطفل
+    </div>
 
-<!-- Toast -->
+    <div class="row">
+      <div class="field">
+        <label><span class="req">*</span> اسم الطفل</label>
+        <select id="nt-child">
+          <option value="">— اختر —</option>
+          <option value="KG-001|Ahmed">Ahmed</option>
+          <option value="KG-002|seif">Seif</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="req">*</span> المعلمة</label>
+        <select id="nt-teacher">
+          <option value="">— اختر —</option>
+          <option value="Miss Sara">Miss Sara</option>
+          <option value="Miss Magda">Miss Magda</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label><span class="req">*</span> نوع الملاحظة</label>
+      <div class="severity-grid" style="grid-template-columns: repeat(2,1fr); gap: 8px;">
+        <button class="sev-btn" onclick="selectNote('نواقص', this)">🎒 نواقص</button>
+        <button class="sev-btn" onclick="selectNote('أكاديمي', this)">📚 أكاديمي</button>
+        <button class="sev-btn" onclick="selectNote('سلوكي', this)">🧒 سلوكي</button>
+        <button class="sev-btn" onclick="selectNote('أخرى', this)">📌 أخرى</button>
+      </div>
+    </div>
+
+    <!-- نواقص -->
+    <div class="field" id="missing-section" style="display:none;">
+      <label>النواقص</label>
+      <div class="severity-grid" style="grid-template-columns: repeat(3,1fr);">
+        <button class="sev-btn" onclick="toggleMissing('مصروف', this)">💰 مصروف</button>
+        <button class="sev-btn" onclick="toggleMissing('شنطة', this)">🎒 شنطة</button>
+        <button class="sev-btn" onclick="toggleMissing('ملابس', this)">👕 ملابس</button>
+        <button class="sev-btn" onclick="toggleMissing('كتاب', this)">📖 كتاب</button>
+        <button class="sev-btn" onclick="toggleMissing('قلم', this)">✏️ قلم</button>
+        <button class="sev-btn" onclick="toggleMissing('أخرى', this)">➕ أخرى</button>
+      </div>
+    </div>
+
+    <!-- أكاديمي -->
+    <div class="field" id="academic-section" style="display:none;">
+      <label>المجال الأكاديمي</label>
+      <div class="severity-grid" style="grid-template-columns: repeat(3,1fr);">
+        <button class="sev-btn" onclick="toggleAcademic('القراءة', this)">📖 القراءة</button>
+        <button class="sev-btn" onclick="toggleAcademic('الكتابة', this)">✍️ الكتابة</button>
+        <button class="sev-btn" onclick="toggleAcademic('الأرقام', this)">🔢 الأرقام</button>
+        <button class="sev-btn" onclick="toggleAcademic('الحروف', this)">🔤 الحروف</button>
+        <button class="sev-btn" onclick="toggleAcademic('التركيز', this)">🎯 التركيز</button>
+        <button class="sev-btn" onclick="toggleAcademic('أخرى', this)">➕ أخرى</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>تفاصيل إضافية</label>
+      <textarea id="nt-details" placeholder="اكتب أي تفاصيل إضافية..."></textarea>
+    </div>
+
+    <button class="btn" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 6px 24px rgba(108,92,231,0.3);" onclick="submit('notes')" id="btn-notes">
+      <span class="spinner"></span>
+      <span class="btn-text">📝 &nbsp; حفظ الملاحظة</span>
+    </button>
+  </div>
+
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -578,10 +659,45 @@
   const URLS = {
     checkin:  'https://fereig202.app.n8n.cloud/webhook/e628a658-f6f0-430f-943a-6cfab5ca6ca8',
     checkout: 'https://fereig202.app.n8n.cloud/webhook/checkout-kg',
-    incident: 'https://fereig202.app.n8n.cloud/webhook/8a558d80-7447-477d-a075-200d9d958373'
+    incident: 'https://fereig202.app.n8n.cloud/webhook/8a558d80-7447-477d-a075-200d9d958373',
+    notes:    'https://fereig202.app.n8n.cloud/webhook/notes-kg'
   };
 
   let selectedSeverity = '';
+  let selectedNoteType = '';
+  let selectedMissing = [];
+  let selectedAcademic = [];
+
+  function selectNote(val, el) {
+    selectedNoteType = val;
+    document.querySelectorAll('#card-notes .severity-grid:first-of-type .sev-btn').forEach(b => b.className = 'sev-btn');
+    el.classList.add('selected-low');
+    document.getElementById('missing-section').style.display = val === 'نواقص' ? 'block' : 'none';
+    document.getElementById('academic-section').style.display = val === 'أكاديمي' ? 'block' : 'none';
+    selectedMissing = [];
+    selectedAcademic = [];
+    document.querySelectorAll('#missing-section .sev-btn, #academic-section .sev-btn').forEach(b => b.className = 'sev-btn');
+  }
+
+  function toggleMissing(val, el) {
+    if (selectedMissing.includes(val)) {
+      selectedMissing = selectedMissing.filter(v => v !== val);
+      el.className = 'sev-btn';
+    } else {
+      selectedMissing.push(val);
+      el.classList.add('selected-mid');
+    }
+  }
+
+  function toggleAcademic(val, el) {
+    if (selectedAcademic.includes(val)) {
+      selectedAcademic = selectedAcademic.filter(v => v !== val);
+      el.className = 'sev-btn';
+    } else {
+      selectedAcademic.push(val);
+      el.classList.add('selected-mid');
+    }
+  }
 
   // Clock
   function updateClock() {
@@ -650,6 +766,22 @@
       body = { child_id: id, child_name: name, teacher_name: teacher, incident: desc, severity: selectedSeverity, timestamp: now };
     }
 
+    if (type === 'notes') {
+      const child = document.getElementById('nt-child').value;
+      const teacher = document.getElementById('nt-teacher').value;
+      const details = document.getElementById('nt-details').value.trim();
+      if (!child || !teacher || !selectedNoteType) return showToast('❗ اختر الطفل والمعلمة ونوع الملاحظة', 'error');
+      const [id, name] = child.split('|');
+      body = {
+        child_id: id, child_name: name, teacher_name: teacher,
+        note_type: selectedNoteType,
+        missing_items: selectedMissing.join('، ') || '-',
+        academic_items: selectedAcademic.join('، ') || '-',
+        details: details || '-',
+        timestamp: now
+      };
+    }
+
     // Loading state
     btn.classList.add('loading');
     btn.disabled = true;
@@ -667,7 +799,16 @@
         // Reset form
         if (type === 'checkin') { document.getElementById('ci-child').value = ''; document.getElementById('ci-teacher').value = ''; }
         if (type === 'checkout') { document.getElementById('co-child').value = ''; document.getElementById('co-teacher').value = ''; }
-        if (type === 'incident') {
+        if (type === 'notes') {
+          document.getElementById('nt-child').value = '';
+          document.getElementById('nt-teacher').value = '';
+          document.getElementById('nt-details').value = '';
+          selectedNoteType = ''; selectedMissing = []; selectedAcademic = [];
+          document.querySelectorAll('#card-notes .sev-btn').forEach(b => b.className = 'sev-btn');
+          document.getElementById('missing-section').style.display = 'none';
+          document.getElementById('academic-section').style.display = 'none';
+        }
+
           document.getElementById('inc-child').value = '';
           document.getElementById('inc-teacher').value = '';
           document.getElementById('inc-desc').value = '';
@@ -687,3 +828,4 @@
 </script>
 </body>
 </html>
+
