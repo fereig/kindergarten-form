@@ -712,9 +712,11 @@
 
   // Tab switching
   function switchTab(tab, el, activeClass) {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
+    document.querySelectorAll('.card').forEach(c => { c.classList.remove('visible'); c.style.display = 'none'; });
     document.querySelectorAll('.tab').forEach(t => t.className = 'tab');
-    document.getElementById('card-' + tab).classList.add('visible');
+    const card = document.getElementById('card-' + tab);
+    card.classList.add('visible');
+    card.style.display = 'block';
     el.classList.add(activeClass);
   }
 
@@ -828,4 +830,3 @@
 </script>
 </body>
 </html>
-
