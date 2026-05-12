@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>روضة النور — تسجيل الحضور</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+  }
+
+  .header p {
+    color: #666;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  select, input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e8ecf0;
+    border-radius: 12px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    color: #1a1a2e;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  select:focus, input:focus {
+    border-color: #4f8ef7;
+    background: white;
+  }
+
+  .status-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .status-btn {
+    padding: 16px;
+    border: 2px solid #e8ecf0;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #666;
+    transition: all 0.2s;
+  }
+
+  .status-btn .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+  .status-btn.active-checkin {
+    border-color: #22c55e;
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+
+  .status-btn.active-checkout {
+    border-color: #f97316;
+    background: #fff7ed;
+    color: #ea580c;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #1a1a2e;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+
+  .submit-btn:hover { background: #2d2d4e; transform: translateY(-1px); }
+  .submit-btn:disabled { background: #999; cursor: not-allowed; transform: none; }
+
+  .success {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    background: #f0fdf4;
+    border-radius: 16px;
+    margin-top: 20px;
+  }
+
+  .success .icon { font-size: 48px; }
+  .success p { color: #16a34a; font-weight: 700; font-size: 16px; margin-top: 8px; }
+
+  .error {
+    display: none;
+    text-align: center;
+    padding: 16px;
+    background: #fef2f2;
+    border-radius: 12px;
+    color: #dc2626;
+    font-weight: 700;
+    margin-top: 12px;
+  }
+
+  .time-display {
+    background: #f8fafc;
+    border: 2px solid #e8ecf0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #1a1a2e;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="logo">🏫</div>
+    <h1>روضة النور</h1>
+    <p>نظام تسجيل الحضور والانصراف</p>
+  </div>
+
+  <div class="form-group">
+    <label>👦 اسم الطفل</label>
+    <select id="child">
+      <option value="">اختاري الطفل...</option>
+      <option value="KG-001|Ahmed">Ahmed</option>
+      <option value="KG-002|omar">omar</option>
+      <option value="KG-003|seif">seif</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>👩‍🏫 اسم المعلمة</label>
+    <select id="teacher">
+      <option value="">اختاري اسمك...</option>
+      <option value="Miss Sara">Miss Sara</option>
+      <option value="Miss magda">Miss magda</option>
+      <option value="Miss نورا">Miss نورا</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>🕐 الوقت الحالي</label>
+    <div class="time-display" id="timeDisplay"></div>
+  </div>
+
+  <div class="form-group">
+    <label>النوع</label>
+    <div class="status-buttons">
+      <button class="status-btn" id="checkinBtn" onclick="selectStatus('check-in')">
+        <span class="icon">✅</span>
+        حضور
+      </button>
+      <button class="status-btn" id="checkoutBtn" onclick="selectStatus('check-out')">
+        <span class="icon">👋</span>
+        انصراف
+      </button>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+    إرسال
+  </button>
+
+  <div class="success" id="successMsg">
+    <div class="icon">🎉</div>
+    <p id="successText">تم التسجيل بنجاح!</p>
+  </div>
+
+  <div class="error" id="errorMsg">
+    ❌ حصل خطأ، حاولي تاني
+  </div>
+</div>
+
+<script>
+  const WEBHOOK_URL = 'https://fereig202.app.n8n.cloud/webhook/e628a658-f6f0-430f-943a-6cfab5ca6ca8';
+  let selectedStatus = '';
+
+  function updateTime() {
+    const now = new Date();
+    const date = now.toLocaleDateString('ar-EG');
+    const time = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('timeDisplay').textContent = `${date} — ${time}`;
+  }
+
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  function selectStatus(status) {
+    selectedStatus = status;
+    document.getElementById('checkinBtn').className = 'status-btn' + (status === 'check-in' ? ' active-checkin' : '');
+    document.getElementById('checkoutBtn').className = 'status-btn' + (status === 'check-out' ? ' active-checkout' : '');
+  }
+
+  async function submitForm() {
+    const childVal = document.getElementById('child').value;
+    const teacher = document.getElementById('teacher').value;
+
+    if (!childVal || !teacher || !selectedStatus) {
+      alert('من فضلك اكملي كل الحقول');
+      return;
+    }
+
+    const [childId, childName] = childVal.split('|');
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'جاري الإرسال...';
+
+    document.getElementById('successMsg').style.display = 'none';
+    document.getElementById('errorMsg').style.display = 'none';
+
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'no-cors',
+        body: JSON.stringify({
+          child_name: childName,
+          child_id: childId,
+          teacher_name: teacher,
+          timestamp: timestamp,
+          status: selectedStatus
+        })
+      });
+
+      const statusText = selectedStatus === 'check-in' ? 'تم تسجيل حضور ' : 'تم تسجيل انصراف ';
+      document.getElementById('successText').textContent = statusText + childName + ' ✅';
+      document.getElementById('successMsg').style.display = 'block';
+
+      document.getElementById('child').value = '';
+      selectedStatus = '';
+      document.getElementById('checkinBtn').className = 'status-btn';
+      document.getElementById('checkoutBtn').className = 'status-btn';
+
+    } catch (e) {
+      document.getElementById('errorMsg').style.display = 'block';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'إرسال';
+  }
+</script>
+</body>
+</html>
