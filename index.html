@@ -861,6 +861,7 @@ async function submitForm(form) {
   try {
     await fetch(WEBHOOKS[form], {
       method:'POST',
+      mode:'no-cors',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
     });
