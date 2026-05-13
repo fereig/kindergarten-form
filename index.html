@@ -734,18 +734,18 @@ body {
 </div><!-- end content -->
 
 <script>
-// ── WEBHOOKS (ضع الـ URLs هنا) ──
-// Children data with chat IDs
+// ── CHILDREN DATA ──
 const CHILDREN = [
   { id: 'KG-001', name: 'Ahmed', parent1_chat_id: '1432640323', parent2_chat_id: '1432640323' },
   { id: 'KG-002', name: 'seif',  parent1_chat_id: '1044655102', parent2_chat_id: '1044655102' }
 ];
 
+// ── WEBHOOKS ──
 const WEBHOOKS = {
   checkin:  'https://fereig202.app.n8n.cloud/webhook/e628a658-f6f0-430f-943a-6cfab5ca6ca8',
   checkout: 'https://fereig202.app.n8n.cloud/webhook/checkout-kg',
   notes:    'https://fereig202.app.n8n.cloud/webhook/notes-kg',
-  incident: 'https://fereig202.app.n8n.cloud/webhook/8a558d80-7447-477d-a075-200d9d958373'
+  incident: 'https://fereig202.app.n8n.cloud/webhook/incident-kg'
 };
 
 // ── STATE ──
@@ -803,7 +803,6 @@ function chip(el, type, cls) {
   const arr = chipData[type];
   const i = arr.indexOf(txt);
   if(wasOn) arr.splice(i,1); else if(i===-1) arr.push(txt);
-  // update hidden
   const map = {missing:'missing_items', academic:'academic_items', behavior:'behavioral_items', incident:'incident_type'};
   const hid = document.getElementById(map[type]);
   if(hid) hid.value = arr.join(', ');
@@ -836,14 +835,12 @@ document.getElementById('nt_teacher').addEventListener('input', ()=>checkBtn('no
 });
 
 // ── CHILD SELECT ──
-function onChildSelect(selectId, hiddenId, form) {
+function onChildSelect(selectId, hiddenId) {
   const sel = document.getElementById(selectId);
   const opt = sel.options[sel.selectedIndex];
   const childId = opt ? (opt.getAttribute('data-id') || '') : '';
   document.getElementById(hiddenId).value = childId;
-  // store chat IDs for this child
   const child = CHILDREN.find(c => c.id === childId);
-  // prefix = selectId without '_child_name' e.g. 'ci', 'co', 'nt', 'inc'
   const prefix = selectId.replace('_child_name', '');
   const p1 = document.getElementById(prefix + '_parent1_chat_id');
   const p2 = document.getElementById(prefix + '_parent2_chat_id');
@@ -938,14 +935,12 @@ function resetPage(form) {
   document.getElementById('suc-'+form).classList.remove('show');
   document.getElementById('form-'+form).style.display = 'block';
 
-  // clear inputs
   document.querySelectorAll(`#page-${form} input[type=text], #page-${form} textarea`).forEach(el => el.value='');
   document.querySelectorAll(`#page-${form} input[type=hidden]`).forEach(el => el.value='');
   document.querySelectorAll(`#page-${form} .chip`).forEach(el => el.className='chip');
   document.querySelectorAll(`#page-${form} .status-card`).forEach(el => el.className='status-card');
   document.querySelectorAll(`#page-${form} .sev-btn`).forEach(el => el.className='sev-btn');
 
-  // reset state
   chipData = {missing:[], academic:[], behavior:[], incident:[]};
   if(form==='checkin') statusData.checkin='';
   if(form==='checkout') statusData.checkout='';
@@ -957,16 +952,8 @@ function resetPage(form) {
 
 // ── LANG ──
 const T = {
-  ar: {
-    sub:'إدارة الحضانة',
-    tl:['حضور','انصراف','ملاحظات','حوادث'],
-    lang:'EN'
-  },
-  en: {
-    sub:'Kindergarten Management',
-    tl:['Check-in','Check-out','Notes','Incident'],
-    lang:'عربي'
-  }
+  ar: { sub:'إدارة الحضانة', tl:['حضور','انصراف','ملاحظات','حوادث'], lang:'EN' },
+  en: { sub:'Kindergarten Management', tl:['Check-in','Check-out','Notes','Incident'], lang:'عربي' }
 };
 function toggleLang() {
   lang = lang==='ar'?'en':'ar';
