@@ -433,7 +433,14 @@ body {
         <div class="card-label"><div class="dot dot-green"></div><span id="ci-lbl1">بيانات الطفل</span></div>
         <div class="field">
           <label><span class="req">*</span> <span id="ci-child">اسم الطفل</span></label>
-          <input type="text" id="ci_child_name" placeholder="أحمد محمد" />
+          <select id="ci_child_name" onchange="onChildSelect('ci_child_name', 'ci_child_id'); checkBtn('checkin')">
+            <option value="">-- اختر الطفل --</option>
+            <option value="Ahmed" data-id="KG-001">Ahmed</option>
+            <option value="seif" data-id="KG-002">seif</option>
+          </select>
+          <input type="hidden" id="ci_child_id" />
+          <input type="hidden" id="ci_parent1_chat_id" />
+          <input type="hidden" id="ci_parent2_chat_id" />
         </div>
         <div class="field">
           <label><span class="req">*</span> <span id="ci-teacher">المعلمة المسؤولة</span></label>
@@ -493,7 +500,14 @@ body {
         <div class="card-label"><div class="dot dot-red"></div><span id="co-lbl1">بيانات الطفل</span></div>
         <div class="field">
           <label><span class="req">*</span> <span id="co-child">اسم الطفل</span></label>
-          <input type="text" id="co_child_name" placeholder="أحمد محمد" />
+          <select id="co_child_name" onchange="onChildSelect('co_child_name', 'co_child_id'); checkBtn('checkout')">
+            <option value="">-- اختر الطفل --</option>
+            <option value="Ahmed" data-id="KG-001">Ahmed</option>
+            <option value="seif" data-id="KG-002">seif</option>
+          </select>
+          <input type="hidden" id="co_child_id" />
+          <input type="hidden" id="co_parent1_chat_id" />
+          <input type="hidden" id="co_parent2_chat_id" />
         </div>
         <div class="field">
           <label><span class="req">*</span> <span id="co-teacher">المعلمة المسؤولة</span></label>
@@ -553,7 +567,14 @@ body {
         <div class="card-label"><div class="dot dot-blue"></div><span id="nt-lbl1">بيانات أساسية</span></div>
         <div class="field">
           <label><span class="req">*</span> <span id="nt-child">اسم الطفل</span></label>
-          <input type="text" id="nt_child_name" placeholder="أحمد محمد" />
+          <select id="nt_child_name" onchange="onChildSelect('nt_child_name', 'nt_child_id'); checkBtn('notes')">
+            <option value="">-- اختر الطفل --</option>
+            <option value="Ahmed" data-id="KG-001">Ahmed</option>
+            <option value="seif" data-id="KG-002">seif</option>
+          </select>
+          <input type="hidden" id="nt_child_id" />
+          <input type="hidden" id="nt_parent1_chat_id" />
+          <input type="hidden" id="nt_parent2_chat_id" />
         </div>
         <div class="field">
           <label><span class="req">*</span> <span id="nt-teacher">المعلمة</span></label>
@@ -643,7 +664,14 @@ body {
         <div class="card-label"><div class="dot dot-amber"></div><span id="inc-lbl1">بيانات الحادثة</span></div>
         <div class="field">
           <label><span class="req">*</span> <span id="inc-child">اسم الطفل</span></label>
-          <input type="text" id="inc_child_name" placeholder="أحمد محمد" />
+          <select id="inc_child_name" onchange="onChildSelect('inc_child_name', 'inc_child_id'); checkBtn('incident')">
+            <option value="">-- اختر الطفل --</option>
+            <option value="Ahmed" data-id="KG-001">Ahmed</option>
+            <option value="seif" data-id="KG-002">seif</option>
+          </select>
+          <input type="hidden" id="inc_child_id" />
+          <input type="hidden" id="inc_parent1_chat_id" />
+          <input type="hidden" id="inc_parent2_chat_id" />
         </div>
         <div class="field">
           <label><span class="req">*</span> <span id="inc-teacher">المعلمة المسؤولة</span></label>
@@ -707,6 +735,12 @@ body {
 
 <script>
 // ── WEBHOOKS (ضع الـ URLs هنا) ──
+// Children data with chat IDs
+const CHILDREN = [
+  { id: 'KG-001', name: 'Ahmed', parent1_chat_id: '1432640323', parent2_chat_id: '1432640323' },
+  { id: 'KG-002', name: 'seif',  parent1_chat_id: '1044655102', parent2_chat_id: '1044655102' }
+];
+
 const WEBHOOKS = {
   checkin:  'https://fereig202.app.n8n.cloud/webhook/e628a658-f6f0-430f-943a-6cfab5ca6ca8',
   checkout: 'https://fereig202.app.n8n.cloud/webhook/checkout-kg',
@@ -794,18 +828,28 @@ function checkBtn(form) {
 function v(id){ const el=document.getElementById(id); return el&&el.value.trim(); }
 
 // ── INPUT LISTENERS ──
-['ci_child_name','ci_teacher'].forEach(id => {
-  document.getElementById(id).addEventListener('input', ()=>checkBtn('checkin'));
-});
-['co_child_name','co_teacher'].forEach(id => {
-  document.getElementById(id).addEventListener('input', ()=>checkBtn('checkout'));
-});
-['nt_child_name','nt_teacher'].forEach(id => {
-  document.getElementById(id).addEventListener('input', ()=>checkBtn('notes'));
-});
-['inc_child_name','inc_teacher','inc_details'].forEach(id => {
+document.getElementById('ci_teacher').addEventListener('input', ()=>checkBtn('checkin'));
+document.getElementById('co_teacher').addEventListener('input', ()=>checkBtn('checkout'));
+document.getElementById('nt_teacher').addEventListener('input', ()=>checkBtn('notes'));
+['inc_teacher','inc_details'].forEach(id => {
   document.getElementById(id).addEventListener('input', ()=>checkBtn('incident'));
 });
+
+// ── CHILD SELECT ──
+function onChildSelect(selectId, hiddenId, form) {
+  const sel = document.getElementById(selectId);
+  const opt = sel.options[sel.selectedIndex];
+  const childId = opt ? (opt.getAttribute('data-id') || '') : '';
+  document.getElementById(hiddenId).value = childId;
+  // store chat IDs for this child
+  const child = CHILDREN.find(c => c.id === childId);
+  // prefix = selectId without '_child_name' e.g. 'ci', 'co', 'nt', 'inc'
+  const prefix = selectId.replace('_child_name', '');
+  const p1 = document.getElementById(prefix + '_parent1_chat_id');
+  const p2 = document.getElementById(prefix + '_parent2_chat_id');
+  if(p1) p1.value = child ? child.parent1_chat_id : '';
+  if(p2) p2.value = child ? child.parent2_chat_id : '';
+}
 
 // ── SUBMIT ──
 async function submitForm(form) {
@@ -823,7 +867,9 @@ async function submitForm(form) {
   if(form==='checkin') {
     payload = {...payload,
       child_name: v('ci_child_name'),
-      child_id: v('ci_child_name').replace(/\s+/g,'-').toLowerCase(),
+      child_id: v('ci_child_id'),
+      parent1_chat_id: v('ci_parent1_chat_id'),
+      parent2_chat_id: v('ci_parent2_chat_id'),
       teacher_name: v('ci_teacher'),
       status: statusData.checkin,
       notes: document.getElementById('ci_notes').value
@@ -831,7 +877,9 @@ async function submitForm(form) {
   } else if(form==='checkout') {
     payload = {...payload,
       child_name: v('co_child_name'),
-      child_id: v('co_child_name').replace(/\s+/g,'-').toLowerCase(),
+      child_id: v('co_child_id'),
+      parent1_chat_id: v('co_parent1_chat_id'),
+      parent2_chat_id: v('co_parent2_chat_id'),
       teacher_name: v('co_teacher'),
       checkout_method: statusData.checkout,
       notes: document.getElementById('co_notes').value
@@ -839,7 +887,9 @@ async function submitForm(form) {
   } else if(form==='notes') {
     payload = {...payload,
       child_name: v('nt_child_name'),
-      child_id: v('nt_child_name').replace(/\s+/g,'-').toLowerCase(),
+      child_id: v('nt_child_id'),
+      parent1_chat_id: v('nt_parent1_chat_id'),
+      parent2_chat_id: v('nt_parent2_chat_id'),
       teacher_name: v('nt_teacher'),
       missing_items: chipData.missing.join(', '),
       academic_items: chipData.academic.join(', '),
@@ -849,7 +899,9 @@ async function submitForm(form) {
   } else if(form==='incident') {
     payload = {...payload,
       child_name: v('inc_child_name'),
-      child_id: v('inc_child_name').replace(/\s+/g,'-').toLowerCase(),
+      child_id: v('inc_child_id'),
+      parent1_chat_id: v('inc_parent1_chat_id'),
+      parent2_chat_id: v('inc_parent2_chat_id'),
       teacher_name: v('inc_teacher'),
       incident_type: chipData.incident.join(', '),
       severity: severityData,
