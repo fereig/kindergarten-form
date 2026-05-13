@@ -846,7 +846,10 @@ function onChildSelect(selectId, hiddenId) {
   const p2 = document.getElementById(prefix + '_parent2_chat_id');
   if(p1) p1.value = child ? child.parent1_chat_id : '';
   if(p2) p2.value = child ? child.parent2_chat_id : '';
-  console.log('DEBUG:', prefix, childId, p1?.value); // مؤقت للتأكد
+  
+  // حفظ في dataset كـ backup
+  sel.dataset.parent1 = child ? child.parent1_chat_id : '';
+  sel.dataset.parent2 = child ? child.parent2_chat_id : '';
 }
 
 // ── SUBMIT ──
@@ -898,8 +901,8 @@ async function submitForm(form) {
     payload = {...payload,
       child_name: v('inc_child_name'),
       child_id: v('inc_child_id'),
-      parent1_chat_id: v('inc_parent1_chat_id'),
-      parent2_chat_id: v('inc_parent2_chat_id'),
+      parent1_chat_id: document.getElementById('inc_child_name').dataset.parent1 || v('inc_parent1_chat_id'),
+parent2_chat_id: document.getElementById('inc_child_name').dataset.parent2 || v('inc_parent2_chat_id'),
       teacher_name: v('inc_teacher'),
       incident_type: chipData.incident.join(', '),
       severity: severityData,
