@@ -841,15 +841,26 @@ function onChildSelect(selectId, hiddenId, form) {
   const opt = sel.options[sel.selectedIndex];
   const childId = opt ? (opt.getAttribute('data-id') || '') : '';
   document.getElementById(hiddenId).value = childId;
+
   // store chat IDs for this child
   const child = CHILDREN.find(c => c.id === childId);
-  // prefix = selectId without '_child_name' e.g. 'ci', 'co', 'nt', 'inc'
-  const prefix = selectId.replace('_child_name', '');
+
+  // auto detect prefix from select id
+  let prefix = '';
+
+  if (selectId.startsWith('ci_')) prefix = 'ci';
+  else if (selectId.startsWith('co_')) prefix = 'co';
+  else if (selectId.startsWith('nt_')) prefix = 'nt';
+  else if (selectId.startsWith('inc_')) prefix = 'inc';
+
   const p1 = document.getElementById(prefix + '_parent1_chat_id');
   const p2 = document.getElementById(prefix + '_parent2_chat_id');
-  if(p1) p1.value = child ? child.parent1_chat_id : '';
-  if(p2) p2.value = child ? child.parent2_chat_id : '';
+
+  if (p1) p1.value = child ? child.parent1_chat_id : '';
+  if (p2) p2.value = child ? child.parent2_chat_id : '';
 }
+
+وده أحسن كمان، لأنك مش هتحتاج تعدل أي HTML خالص.
 
 // ── SUBMIT ──
 async function submitForm(form) {
