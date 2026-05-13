@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>KG System</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F1117;
+  --surface: #1A1D27;
+  --surface2: #22263A;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #F0F0F0;
+  --muted: #8A8FA8;
+  --primary: #6C8EFF;
+  --primary-glow: rgba(108,142,255,0.18);
+  --green: #4ADE80;
+  --green-glow: rgba(74,222,128,0.15);
+  --red: #F87171;
+  --red-glow: rgba(248,113,113,0.15);
+  --amber: #FBBF24;
+  --amber-glow: rgba(251,191,36,0.15);
+  --purple: #C084FC;
+  --purple-glow: rgba(192,132,252,0.15);
+  --teal: #2DD4BF;
+  --teal-glow: rgba(45,212,191,0.15);
+  --r: 16px;
+  --r-sm: 10px;
+  --r-xs: 7px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(145deg, #1A1D27 0%, #0F1117 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content:'';
+  position:absolute;
+  top:-80px; left:50%;
+  transform:translateX(-50%);
+  width:320px; height:160px;
+  background: radial-gradient(ellipse, rgba(108,142,255,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.header-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand-icon {
+  width:38px; height:38px;
+  background: linear-gradient(135deg, var(--primary), #a78bfa);
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+}
+.brand-name {
+  font-size:17px;
+  font-weight:800;
+  background: linear-gradient(90deg, #fff, #a78bfa);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.brand-sub {
+  font-size:11px;
+  color:var(--muted);
+  font-weight:300;
+  -webkit-text-fill-color: var(--muted);
+}
+.lang-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: all 0.2s;
+}
+.lang-btn:hover { color: var(--text); border-color: var(--primary); }
+
+/* Mode tabs */
+.mode-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border-radius: 14px 14px 0 0;
+  padding: 5px 5px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mode-tabs::-webkit-scrollbar { display:none; }
+.tab {
+  flex: 1;
+  min-width: 72px;
+  padding: 10px 8px 14px;
+  border-radius: 10px 10px 0 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Tajawal', sans-serif;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.tab .tab-icon { font-size: 20px; }
+.tab.active {
+  background: var(--bg);
+  color: var(--text);
+}
+.tab.active.t-checkin  { color: var(--green); }
+.tab.active.t-checkout { color: var(--red); }
+.tab.active.t-notes    { color: var(--primary); }
+.tab.active.t-incident { color: var(--amber); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 20px 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* Section pages */
+.page { display:none; animation: slideUp 0.3s ease; }
+.page.active { display:block; }
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content:'';
+  position:absolute;
+  top:0; right:0;
+  width:80px; height:80px;
+  border-radius:50%;
+  opacity:0.5;
+  pointer-events:none;
+}
+.card.glow-green::before  { background: radial-gradient(circle, var(--green-glow), transparent 70%); }
+.card.glow-red::before    { background: radial-gradient(circle, var(--red-glow), transparent 70%); }
+.card.glow-blue::before   { background: radial-gradient(circle, var(--primary-glow), transparent 70%); }
+.card.glow-amber::before  { background: radial-gradient(circle, var(--amber-glow), transparent 70%); }
+.card.glow-purple::before { background: radial-gradient(circle, var(--purple-glow), transparent 70%); }
+.card.glow-teal::before   { background: radial-gradient(circle, var(--teal-glow), transparent 70%); }
+
+.card-label {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:14px;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+}
+.card-label .dot {
+  width:6px; height:6px;
+  border-radius:50%;
+}
+.dot-green  { background:var(--green); }
+.dot-red    { background:var(--red); }
+.dot-blue   { background:var(--primary); }
+.dot-amber  { background:var(--amber); }
+.dot-purple { background:var(--purple); }
+.dot-teal   { background:var(--teal); }
+
+/* ── FIELDS ── */
+.field { margin-bottom:14px; }
+.field:last-child { margin-bottom:0; }
+.field label {
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:7px;
+  font-weight:500;
+}
+.field input, .field select, .field textarea {
+  width:100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size:15px;
+  padding:12px 14px;
+  outline:none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance:none;
+}
+.field input::placeholder, .field textarea::placeholder { color:var(--muted); }
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108,142,255,0.12);
+}
+.field textarea { resize:none; min-height:80px; line-height:1.6; }
+.field select { cursor:pointer; }
+.field select option { background: var(--surface2); }
+
+/* ── CHIPS ── */
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip {
+  padding:8px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius:20px;
+  font-size:13px;
+  font-family:'Tajawal',sans-serif;
+  color: var(--muted);
+  cursor:pointer;
+  transition: all 0.18s;
+  user-select:none;
+}
+.chip:active { transform:scale(0.95); }
+.chip.on-green  { background:var(--green-glow);  border-color:var(--green);  color:var(--green); }
+.chip.on-blue   { background:var(--primary-glow); border-color:var(--primary); color:var(--primary); }
+.chip.on-amber  { background:var(--amber-glow);  border-color:var(--amber);  color:var(--amber); }
+.chip.on-red    { background:var(--red-glow);    border-color:var(--red);    color:var(--red); }
+.chip.on-purple { background:var(--purple-glow); border-color:var(--purple); color:var(--purple); }
+.chip.on-teal   { background:var(--teal-glow);   border-color:var(--teal);   color:var(--teal); }
+
+/* ── STATUS SELECTOR (check-in) ── */
+.status-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.status-card {
+  padding:14px 10px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.status-card:active { transform:scale(0.97); }
+.status-card .s-icon { font-size:26px; display:block; margin-bottom:6px; }
+.status-card .s-label { font-size:13px; font-weight:700; color:var(--muted); display:block; }
+.status-card.sel-green { border-color:var(--green); background:var(--green-glow); }
+.status-card.sel-green .s-label { color:var(--green); }
+.status-card.sel-red { border-color:var(--red); background:var(--red-glow); }
+.status-card.sel-red .s-label { color:var(--red); }
+.status-card.sel-amber { border-color:var(--amber); background:var(--amber-glow); }
+.status-card.sel-amber .s-label { color:var(--amber); }
+
+/* ── SUBMIT ── */
+.submit-btn {
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius: var(--r-sm);
+  font-size:16px;
+  font-weight:700;
+  font-family:'Tajawal',sans-serif;
+  cursor:pointer;
+  transition:all 0.2s;
+  margin-top:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.submit-btn:active { transform:scale(0.98); }
+.submit-btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+.btn-checkin  { background:var(--green);   color:#000; }
+.btn-checkout { background:var(--red);     color:#fff; }
+.btn-notes    { background:var(--primary); color:#fff; }
+.btn-incident { background:var(--amber);   color:#000; }
+
+/* ── SUCCESS ── */
+.success-wrap {
+  display:none;
+  text-align:center;
+  padding:50px 20px;
+  animation: slideUp 0.4s ease;
+}
+.success-wrap.show { display:block; }
+.success-ring {
+  width:80px; height:80px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px;
+  margin:0 auto 20px;
+}
+.ring-green  { background:var(--green-glow);  border:2px solid var(--green); }
+.ring-red    { background:var(--red-glow);    border:2px solid var(--red); }
+.ring-blue   { background:var(--primary-glow);border:2px solid var(--primary); }
+.ring-amber  { background:var(--amber-glow);  border:2px solid var(--amber); }
+.s-title { font-size:22px; font-weight:800; margin-bottom:8px; }
+.s-sub   { font-size:14px; color:var(--muted); line-height:1.6; }
+.s-again {
+  margin-top:24px;
+  padding:12px 28px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:var(--r-sm);
+  color:var(--text);
+  font-size:14px;
+  font-weight:600;
+  font-family:'Tajawal',sans-serif;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.s-again:hover { border-color:var(--primary); color:var(--primary); }
+
+/* ── SPINNER ── */
+.spin {
+  width:18px; height:18px;
+  border:2px solid rgba(255,255,255,0.3);
+  border-top-color:currentColor;
+  border-radius:50%;
+  animation:rot 0.7s linear infinite;
+  display:none;
+}
+.spin.show { display:inline-block; }
+@keyframes rot { to{transform:rotate(360deg)} }
+
+/* ── DATE BADGE ── */
+.date-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:6px 12px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:18px;
+}
+
+/* ── DIVIDER ── */
+.divider { height:1px; background:var(--border); margin:16px 0; }
+
+/* Severity */
+.severity-row { display:flex; gap:8px; }
+.sev-btn {
+  flex:1; padding:11px 6px; text-align:center;
+  background:var(--surface2); border:1.5px solid var(--border2);
+  border-radius:var(--r-sm); cursor:pointer; transition:all 0.2s;
+  font-family:'Tajawal',sans-serif; font-size:13px; font-weight:600; color:var(--muted);
+}
+.sev-btn:active{transform:scale(0.96)}
+.sev-btn.sel-green{border-color:var(--green);background:var(--green-glow);color:var(--green)}
+.sev-btn.sel-amber{border-color:var(--amber);background:var(--amber-glow);color:var(--amber)}
+.sev-btn.sel-red{border-color:var(--red);background:var(--red-glow);color:var(--red)}
+
+/* req star */
+.req { color:var(--red); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-icon">🎓</div>
+      <div>
+        <div class="brand-name" id="brand-name">KG System</div>
+        <div class="brand-sub" id="brand-sub">إدارة الحضانة</div>
+      </div>
+    </div>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="tab t-checkin active" onclick="switchTab('checkin',this)" id="tab-checkin">
+      <span class="tab-icon">✅</span>
+      <span id="tl-1">حضور</span>
+    </button>
+    <button class="tab t-checkout" onclick="switchTab('checkout',this)" id="tab-checkout">
+      <span class="tab-icon">🚪</span>
+      <span id="tl-2">انصراف</span>
+    </button>
+    <button class="tab t-notes" onclick="switchTab('notes',this)" id="tab-notes">
+      <span class="tab-icon">📋</span>
+      <span id="tl-3">ملاحظات</span>
+    </button>
+    <button class="tab t-incident" onclick="switchTab('incident',this)" id="tab-incident">
+      <span class="tab-icon">⚠️</span>
+      <span id="tl-4">حوادث</span>
+    </button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- ══ CHECK-IN ══ -->
+  <div class="page active" id="page-checkin">
+    <div id="form-checkin">
+      <div class="date-badge">📅 <span id="date-ci"></span></div>
+
+      <div class="card glow-green">
+        <div class="card-label"><div class="dot dot-green"></div><span id="ci-lbl1">بيانات الطفل</span></div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="ci-child">اسم الطفل</span></label>
+          <input type="text" id="ci_child_name" placeholder="أحمد محمد" />
+        </div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="ci-teacher">المعلمة المسؤولة</span></label>
+          <input type="text" id="ci_teacher" placeholder="Miss Sara" />
+        </div>
+      </div>
+
+      <div class="card glow-green">
+        <div class="card-label"><div class="dot dot-green"></div><span id="ci-lbl2">حالة الوصول</span></div>
+        <div class="status-grid">
+          <div class="status-card" onclick="selectStatus('checkin','حاضر',this,'sel-green')" id="ci-s1">
+            <span class="s-icon">✅</span>
+            <span class="s-label" id="ci-s1l">حاضر</span>
+          </div>
+          <div class="status-card" onclick="selectStatus('checkin','متأخر',this,'sel-amber')" id="ci-s2">
+            <span class="s-icon">⏰</span>
+            <span class="s-label" id="ci-s2l">متأخر</span>
+          </div>
+          <div class="status-card" onclick="selectStatus('checkin','غائب',this,'sel-red')" id="ci-s3">
+            <span class="s-icon">❌</span>
+            <span class="s-label" id="ci-s3l">غائب</span>
+          </div>
+          <div class="status-card" onclick="selectStatus('checkin','إجازة',this,'sel-amber')" id="ci-s4">
+            <span class="s-icon">🏖️</span>
+            <span class="s-label" id="ci-s4l">إجازة</span>
+          </div>
+        </div>
+        <input type="hidden" id="ci_status" />
+      </div>
+
+      <div class="card">
+        <div class="card-label"><div class="dot dot-green"></div><span id="ci-lbl3">ملاحظة (اختياري)</span></div>
+        <div class="field">
+          <textarea id="ci_notes" placeholder="أي ملاحظة عند الوصول..." rows="3"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn btn-checkin" id="btn-ci" onclick="submitForm('checkin')" disabled>
+        <span id="btn-ci-txt">تسجيل الحضور</span>
+        <div class="spin" id="spin-ci"></div>
+      </button>
+    </div>
+    <div class="success-wrap" id="suc-checkin">
+      <div class="success-ring ring-green">✅</div>
+      <div class="s-title" id="suc-ci-t">تم تسجيل الحضور!</div>
+      <div class="s-sub" id="suc-ci-s">تم إرسال إشعار لولي الأمر</div>
+      <button class="s-again" onclick="resetPage('checkin')" id="suc-ci-btn">+ تسجيل طفل آخر</button>
+    </div>
+  </div>
+
+  <!-- ══ CHECK-OUT ══ -->
+  <div class="page" id="page-checkout">
+    <div id="form-checkout">
+      <div class="date-badge">📅 <span id="date-co"></span></div>
+
+      <div class="card glow-red">
+        <div class="card-label"><div class="dot dot-red"></div><span id="co-lbl1">بيانات الطفل</span></div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="co-child">اسم الطفل</span></label>
+          <input type="text" id="co_child_name" placeholder="أحمد محمد" />
+        </div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="co-teacher">المعلمة المسؤولة</span></label>
+          <input type="text" id="co_teacher" placeholder="Miss Sara" />
+        </div>
+      </div>
+
+      <div class="card glow-red">
+        <div class="card-label"><div class="dot dot-red"></div><span id="co-lbl2">طريقة الانصراف</span></div>
+        <div class="status-grid">
+          <div class="status-card" onclick="selectStatus('checkout','ولي الأمر',this,'sel-green')" id="co-s1">
+            <span class="s-icon">👨‍👩‍👦</span>
+            <span class="s-label" id="co-s1l">ولي الأمر</span>
+          </div>
+          <div class="status-card" onclick="selectStatus('checkout','مفوض',this,'sel-amber')" id="co-s2">
+            <span class="s-icon">🪪</span>
+            <span class="s-label" id="co-s2l">مفوض</span>
+          </div>
+          <div class="status-card" onclick="selectStatus('checkout','باص',this,'sel-amber')" id="co-s3">
+            <span class="s-icon">🚌</span>
+            <span class="s-label" id="co-s3l">باص مدرسي</span>
+          </div>
+          <div class="status-card" onclick="selectStatus('checkout','لم ينصرف',this,'sel-red')" id="co-s4">
+            <span class="s-icon">⏳</span>
+            <span class="s-label" id="co-s4l">لم ينصرف</span>
+          </div>
+        </div>
+        <input type="hidden" id="co_method" />
+      </div>
+
+      <div class="card">
+        <div class="card-label"><div class="dot dot-red"></div><span id="co-lbl3">ملاحظة (اختياري)</span></div>
+        <div class="field">
+          <textarea id="co_notes" placeholder="أي ملاحظة عند الانصراف..." rows="3"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn btn-checkout" id="btn-co" onclick="submitForm('checkout')" disabled>
+        <span id="btn-co-txt">تسجيل الانصراف</span>
+        <div class="spin" id="spin-co"></div>
+      </button>
+    </div>
+    <div class="success-wrap" id="suc-checkout">
+      <div class="success-ring ring-red">🚪</div>
+      <div class="s-title" id="suc-co-t">تم تسجيل الانصراف!</div>
+      <div class="s-sub" id="suc-co-s">تم إرسال إشعار لولي الأمر</div>
+      <button class="s-again" onclick="resetPage('checkout')" id="suc-co-btn">+ تسجيل طفل آخر</button>
+    </div>
+  </div>
+
+  <!-- ══ NOTES ══ -->
+  <div class="page" id="page-notes">
+    <div id="form-notes">
+      <div class="date-badge">📅 <span id="date-nt"></span></div>
+
+      <div class="card glow-blue">
+        <div class="card-label"><div class="dot dot-blue"></div><span id="nt-lbl1">بيانات أساسية</span></div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="nt-child">اسم الطفل</span></label>
+          <input type="text" id="nt_child_name" placeholder="أحمد محمد" />
+        </div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="nt-teacher">المعلمة</span></label>
+          <input type="text" id="nt_teacher" placeholder="Miss Sara" />
+        </div>
+      </div>
+
+      <!-- Missing items -->
+      <div class="card glow-amber">
+        <div class="card-label"><div class="dot dot-amber"></div><span id="nt-lbl-miss">🎒 النواقص</span></div>
+        <div class="chips" id="chips-missing">
+          <div class="chip" onclick="chip(this,'missing','on-amber')">مريول</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">حذاء رياضي</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">شنطة</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">زجاجة مياه</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">فرشة أسنان</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">ملابس إضافية</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">مصروف</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">قلم</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">كراسة</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">كتاب</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">مقص</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">ألوان</div>
+          <div class="chip" onclick="chip(this,'missing','on-amber')">طعام</div>
+        </div>
+        <input type="hidden" id="missing_items" />
+      </div>
+
+      <!-- Academic -->
+      <div class="card glow-blue">
+        <div class="card-label"><div class="dot dot-blue"></div><span id="nt-lbl-acad">📚 أكاديمي</span></div>
+        <div class="chips" id="chips-academic">
+          <div class="chip" onclick="chip(this,'academic','on-blue')">ضعف في التركيز</div>
+          <div class="chip" onclick="chip(this,'academic','on-blue')">لا يشارك</div>
+          <div class="chip" onclick="chip(this,'academic','on-blue')">صعوبة في القراءة</div>
+          <div class="chip" onclick="chip(this,'academic','on-blue')">صعوبة في الكتابة</div>
+          <div class="chip" onclick="chip(this,'academic','on-blue')">تحسن ملحوظ</div>
+          <div class="chip" onclick="chip(this,'academic','on-blue')">متميز</div>
+          <div class="chip" onclick="chip(this,'academic','on-blue')">يحتاج متابعة</div>
+        </div>
+        <input type="hidden" id="academic_items" />
+      </div>
+
+      <!-- Behavioral -->
+      <div class="card glow-purple">
+        <div class="card-label"><div class="dot dot-purple"></div><span id="nt-lbl-beh">⭐ سلوكي</span></div>
+        <div class="chips" id="chips-behavior">
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">عدواني</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">مش مركز</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">نشاط زيادة</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">يبكي كثيراً</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">انطوائي</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">سلوك ممتاز</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">يؤذي زملاءه</div>
+          <div class="chip" onclick="chip(this,'behavior','on-purple')">عنيد</div>
+        </div>
+        <input type="hidden" id="behavioral_items" />
+      </div>
+
+      <!-- Details -->
+      <div class="card">
+        <div class="card-label"><div class="dot dot-blue"></div><span id="nt-lbl-det">💬 تفاصيل إضافية</span></div>
+        <div class="field">
+          <textarea id="nt_details" placeholder="أي ملاحظات إضافية..." rows="3"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn btn-notes" id="btn-nt" onclick="submitForm('notes')" disabled>
+        <span id="btn-nt-txt">إرسال الملاحظة</span>
+        <div class="spin" id="spin-nt"></div>
+      </button>
+    </div>
+    <div class="success-wrap" id="suc-notes">
+      <div class="success-ring ring-blue">📋</div>
+      <div class="s-title" id="suc-nt-t">تم إرسال الملاحظة!</div>
+      <div class="s-sub" id="suc-nt-s">تم حفظها وإرسالها لولي الأمر</div>
+      <button class="s-again" onclick="resetPage('notes')" id="suc-nt-btn">+ ملاحظة جديدة</button>
+    </div>
+  </div>
+
+  <!-- ══ INCIDENT ══ -->
+  <div class="page" id="page-incident">
+    <div id="form-incident">
+      <div class="date-badge">📅 <span id="date-inc"></span></div>
+
+      <div class="card glow-amber">
+        <div class="card-label"><div class="dot dot-amber"></div><span id="inc-lbl1">بيانات الحادثة</span></div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="inc-child">اسم الطفل</span></label>
+          <input type="text" id="inc_child_name" placeholder="أحمد محمد" />
+        </div>
+        <div class="field">
+          <label><span class="req">*</span> <span id="inc-teacher">المعلمة المسؤولة</span></label>
+          <input type="text" id="inc_teacher" placeholder="Miss Sara" />
+        </div>
+      </div>
+
+      <div class="card glow-amber">
+        <div class="card-label"><div class="dot dot-amber"></div><span id="inc-lbl2">نوع الحادثة</span></div>
+        <div class="chips" id="chips-incident">
+          <div class="chip" onclick="chip(this,'incident','on-amber')">سقوط</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">شجار</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">جرح</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">مرض مفاجئ</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">بكاء شديد</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">حساسية</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">تقيؤ</div>
+          <div class="chip" onclick="chip(this,'incident','on-amber')">أخرى</div>
+        </div>
+        <input type="hidden" id="incident_type" />
+      </div>
+
+      <div class="card glow-red">
+        <div class="card-label"><div class="dot dot-red"></div><span id="inc-lbl3">درجة الخطورة</span></div>
+        <div class="severity-row">
+          <div class="sev-btn" onclick="selectSev(this,'بسيطة','sel-green')" id="sev1"><span id="sev1l">بسيطة</span></div>
+          <div class="sev-btn" onclick="selectSev(this,'متوسطة','sel-amber')" id="sev2"><span id="sev2l">متوسطة</span></div>
+          <div class="sev-btn" onclick="selectSev(this,'خطيرة','sel-red')" id="sev3"><span id="sev3l">خطيرة</span></div>
+        </div>
+        <input type="hidden" id="inc_severity" />
+      </div>
+
+      <div class="card">
+        <div class="card-label"><div class="dot dot-amber"></div><span id="inc-lbl4">وصف الحادثة <span class="req">*</span></span></div>
+        <div class="field">
+          <textarea id="inc_details" placeholder="اشرح ما حدث بالتفصيل..." rows="4"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label"><div class="dot dot-teal"></div><span id="inc-lbl5">الإجراء المتخذ</span></div>
+        <div class="field">
+          <textarea id="inc_action" placeholder="ما الإجراء الذي تم اتخاذه؟" rows="3"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn btn-incident" id="btn-inc" onclick="submitForm('incident')" disabled>
+        <span id="btn-inc-txt">إرسال تقرير الحادثة</span>
+        <div class="spin" id="spin-inc"></div>
+      </button>
+    </div>
+    <div class="success-wrap" id="suc-incident">
+      <div class="success-ring ring-amber">⚠️</div>
+      <div class="s-title" id="suc-inc-t">تم إرسال التقرير!</div>
+      <div class="s-sub" id="suc-inc-s">تم إشعار ولي الأمر فوراً</div>
+      <button class="s-again" onclick="resetPage('incident')" id="suc-inc-btn">+ تقرير جديد</button>
+    </div>
+  </div>
+
+</div><!-- end content -->
+
+<script>
+// ── WEBHOOKS (ضع الـ URLs هنا) ──
+const WEBHOOKS = {
+  checkin:  'https://fereig202.app.n8n.cloud/webhook/e628a658-f6f0-430f-943a-6cfab5ca6ca8',
+  checkout: 'https://fereig202.app.n8n.cloud/webhook/checkout-kg',
+  notes:    'https://fereig202.app.n8n.cloud/webhook/notes-kg',
+  incident: 'https://fereig202.app.n8n.cloud/webhook/8a558d80-7447-477d-a075-200d9d958373'
+};
+
+// ── STATE ──
+let lang = 'ar';
+let chipData = { missing:[], academic:[], behavior:[], incident:[] };
+let statusData = { checkin:'', checkout:'' };
+let severityData = '';
+
+// ── DATE ──
+function setDates() {
+  const d = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  const str = d.toLocaleDateString(lang==='ar'?'ar-EG':'en-US', opts);
+  ['ci','co','nt','inc'].forEach(id => {
+    const el = document.getElementById('date-'+id);
+    if(el) el.textContent = str;
+  });
+}
+
+// ── TABS ──
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+}
+
+// ── STATUS SELECT ──
+function selectStatus(form, value, el, cls) {
+  const prefix = form==='checkin' ? 'ci' : 'co';
+  document.querySelectorAll(`#page-${form} .status-card`).forEach(c => {
+    c.className = 'status-card';
+  });
+  el.classList.add(cls);
+  if(form==='checkin') statusData.checkin = value;
+  else statusData.checkout = value;
+  document.getElementById(prefix==='ci'?'ci_status':'co_method').value = value;
+  checkBtn(form);
+}
+
+// ── SEVERITY ──
+function selectSev(el, val, cls) {
+  document.querySelectorAll('.sev-btn').forEach(b => b.className='sev-btn');
+  el.classList.add(cls);
+  severityData = val;
+  document.getElementById('inc_severity').value = val;
+  checkBtn('incident');
+}
+
+// ── CHIPS ──
+function chip(el, type, cls) {
+  const wasOn = el.classList.contains(cls);
+  el.className = wasOn ? 'chip' : 'chip '+cls;
+  const txt = el.textContent.trim();
+  const arr = chipData[type];
+  const i = arr.indexOf(txt);
+  if(wasOn) arr.splice(i,1); else if(i===-1) arr.push(txt);
+  // update hidden
+  const map = {missing:'missing_items', academic:'academic_items', behavior:'behavioral_items', incident:'incident_type'};
+  const hid = document.getElementById(map[type]);
+  if(hid) hid.value = arr.join(', ');
+  checkBtn('notes');
+  if(type==='incident') checkBtn('incident');
+}
+
+// ── CHECK SUBMIT ──
+function checkBtn(form) {
+  let ok = false;
+  if(form==='checkin')
+    ok = v('ci_child_name') && v('ci_teacher') && statusData.checkin;
+  else if(form==='checkout')
+    ok = v('co_child_name') && v('co_teacher') && statusData.checkout;
+  else if(form==='notes')
+    ok = v('nt_child_name') && v('nt_teacher');
+  else if(form==='incident')
+    ok = v('inc_child_name') && v('inc_teacher') && v('inc_details');
+  const btn = document.getElementById('btn-'+{'checkin':'ci','checkout':'co','notes':'nt','incident':'inc'}[form]);
+  if(btn) btn.disabled = !ok;
+}
+function v(id){ const el=document.getElementById(id); return el&&el.value.trim(); }
+
+// ── INPUT LISTENERS ──
+['ci_child_name','ci_teacher'].forEach(id => {
+  document.getElementById(id).addEventListener('input', ()=>checkBtn('checkin'));
+});
+['co_child_name','co_teacher'].forEach(id => {
+  document.getElementById(id).addEventListener('input', ()=>checkBtn('checkout'));
+});
+['nt_child_name','nt_teacher'].forEach(id => {
+  document.getElementById(id).addEventListener('input', ()=>checkBtn('notes'));
+});
+['inc_child_name','inc_teacher','inc_details'].forEach(id => {
+  document.getElementById(id).addEventListener('input', ()=>checkBtn('incident'));
+});
+
+// ── SUBMIT ──
+async function submitForm(form) {
+  const map = {checkin:'ci', checkout:'co', notes:'nt', incident:'inc'};
+  const k = map[form];
+  const btn = document.getElementById('btn-'+k);
+  const spin = document.getElementById('spin-'+k);
+  const txt = document.getElementById('btn-'+k+'-txt');
+  btn.disabled = true;
+  spin.classList.add('show');
+  txt.style.opacity = '0.5';
+
+  let payload = { timestamp: new Date().toISOString() };
+
+  if(form==='checkin') {
+    payload = {...payload,
+      child_name: v('ci_child_name'),
+      child_id: v('ci_child_name').replace(/\s+/g,'-').toLowerCase(),
+      teacher_name: v('ci_teacher'),
+      status: statusData.checkin,
+      notes: document.getElementById('ci_notes').value
+    };
+  } else if(form==='checkout') {
+    payload = {...payload,
+      child_name: v('co_child_name'),
+      child_id: v('co_child_name').replace(/\s+/g,'-').toLowerCase(),
+      teacher_name: v('co_teacher'),
+      checkout_method: statusData.checkout,
+      notes: document.getElementById('co_notes').value
+    };
+  } else if(form==='notes') {
+    payload = {...payload,
+      child_name: v('nt_child_name'),
+      child_id: v('nt_child_name').replace(/\s+/g,'-').toLowerCase(),
+      teacher_name: v('nt_teacher'),
+      missing_items: chipData.missing.join(', '),
+      academic_items: chipData.academic.join(', '),
+      behavioral_items: chipData.behavior.join(', '),
+      details: document.getElementById('nt_details').value
+    };
+  } else if(form==='incident') {
+    payload = {...payload,
+      child_name: v('inc_child_name'),
+      child_id: v('inc_child_name').replace(/\s+/g,'-').toLowerCase(),
+      teacher_name: v('inc_teacher'),
+      incident_type: chipData.incident.join(', '),
+      severity: severityData,
+      details: document.getElementById('inc_details').value,
+      action_taken: document.getElementById('inc_action').value
+    };
+  }
+
+  try {
+    const res = await fetch(WEBHOOKS[form], {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+  } catch(e){
+    spin.classList.remove('show');
+    txt.style.opacity = '1';
+    btn.disabled = false;
+    alert('❌ فيه مشكلة في الإرسال!\n\nتأكد من:\n1. الـ n8n شغال\n2. الـ webhook URL صح\n\nالخطأ: ' + e.message);
+    return;
+  }
+
+  spin.classList.remove('show');
+  document.getElementById('form-'+form).style.display = 'none';
+  document.getElementById('suc-'+form).classList.add('show');
+}
+
+// ── RESET ──
+function resetPage(form) {
+  const map = {checkin:'ci', checkout:'co', notes:'nt', incident:'inc'};
+  const k = map[form];
+
+  document.getElementById('suc-'+form).classList.remove('show');
+  document.getElementById('form-'+form).style.display = 'block';
+
+  // clear inputs
+  document.querySelectorAll(`#page-${form} input[type=text], #page-${form} textarea`).forEach(el => el.value='');
+  document.querySelectorAll(`#page-${form} input[type=hidden]`).forEach(el => el.value='');
+  document.querySelectorAll(`#page-${form} .chip`).forEach(el => el.className='chip');
+  document.querySelectorAll(`#page-${form} .status-card`).forEach(el => el.className='status-card');
+  document.querySelectorAll(`#page-${form} .sev-btn`).forEach(el => el.className='sev-btn');
+
+  // reset state
+  chipData = {missing:[], academic:[], behavior:[], incident:[]};
+  if(form==='checkin') statusData.checkin='';
+  if(form==='checkout') statusData.checkout='';
+  severityData='';
+
+  const btn = document.getElementById('btn-'+k);
+  if(btn){ btn.disabled=true; btn.querySelector('.spin').classList.remove('show'); btn.querySelector('[id^=btn-'+k+'-txt]').style.opacity='1'; }
+}
+
+// ── LANG ──
+const T = {
+  ar: {
+    sub:'إدارة الحضانة',
+    tl:['حضور','انصراف','ملاحظات','حوادث'],
+    lang:'EN'
+  },
+  en: {
+    sub:'Kindergarten Management',
+    tl:['Check-in','Check-out','Notes','Incident'],
+    lang:'عربي'
+  }
+};
+function toggleLang() {
+  lang = lang==='ar'?'en':'ar';
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==='ar'?'rtl':'ltr';
+  document.getElementById('brand-sub').textContent = T[lang].sub;
+  document.getElementById('lang-btn').textContent = T[lang].lang;
+  ['tl-1','tl-2','tl-3','tl-4'].forEach((id,i)=>{
+    document.getElementById(id).textContent = T[lang].tl[i];
+  });
+  setDates();
+}
+
+// ── INIT ──
+setDates();
+</script>
+</body>
+</html>
