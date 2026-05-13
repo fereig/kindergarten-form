@@ -846,6 +846,7 @@ function onChildSelect(selectId, hiddenId) {
   const p2 = document.getElementById(prefix + '_parent2_chat_id');
   if(p1) p1.value = child ? child.parent1_chat_id : '';
   if(p2) p2.value = child ? child.parent2_chat_id : '';
+  console.log('DEBUG:', prefix, childId, p1?.value); // مؤقت للتأكد
 }
 
 // ── SUBMIT ──
